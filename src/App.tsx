@@ -65,10 +65,13 @@ const Label = styled.label`
 
 function App() {
     const [pdfFileList, setPdfFileList] = useState<Array<File>>([]);
+
+    const getUrl = () => {
+        const blob = new Blob();
+    }
     const onPdfFileUpload = (e: any) => {
         const selectedList: Array<File> = Array.from(e.target.files);
         setPdfFileList(selectedList);
-        console.log(selectedList);
     }
     const FileResultList = () => {
         return (
