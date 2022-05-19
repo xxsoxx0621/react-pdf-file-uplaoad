@@ -1,6 +1,15 @@
 import React, {useState} from 'react';
 import './App.css';
 import styled from "styled-components";
+import {ViewPDF} from "./ViewPDF";
+import {pdfjs} from 'react-pdf';
+
+// workerSrc 정의 하지 않으면 pdf 보여지지 않습니다.
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+interface Props {
+    visible: boolean
+}
 
 const FileContainer = styled.div`
        display:flex;
@@ -63,23 +72,50 @@ const Label = styled.label`
         font-size:13px;
 `;
 
+const ModalOverlay = styled.div<Props>`
+  box-sizing: border-box;
+  display: ${(props) => (props.visible ? 'flex' : 'none')};
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+`
+
+
 function App() {
     const [pdfFileList, setPdfFileList] = useState<Array<File>>([]);
+    const [pdfUrl, setPdfUrl] = useState<string>();
+    const [showModal, setShowModal] = useState(false);
 
-    const getUrl = () => {
-        const blob = new Blob();
+    const getUrl = (file: File) => {
+        const blob = new Blob([file]);
+        console.log(blob);
+        const pdfUrl = URL.createObjectURL(blob);
+        setPdfUrl(pdfUrl);
     }
     const onPdfFileUpload = (e: any) => {
         const selectedList: Array<File> = Array.from(e.target.files);
+        console.log(e.target.files);
+        const getAddList = selectedList.map(item => item);
+        getUrl(getAddList[0]);
         setPdfFileList(selectedList);
     }
+
     const FileResultList = () => {
         return (
             <>
                 {
-                    pdfFileList.map((item) =>(
+                    pdfFileList.map((item, index) => (
                         <FileResultBody>
-                            <FileResultRow>{item.name}</FileResultRow>
+                            <FileResultRow key={index}>
+                                <a onClick={onUrlClick}>{item.name}</a>
+                            </FileResultRow>
+
                         </FileResultBody>
                     ))
                 }
@@ -87,8 +123,18 @@ function App() {
             </>
         )
     }
+    const onUrlClick = (e: any) => {
+        setShowModal(true);
+    };
+    const onPdfClose = (e: any) => {
+        setShowModal(false);
+    }
     return (
         <FileContainer>
+            <ModalOverlay visible={showModal}>
+                <button onClick={onPdfClose}>X</button>
+                <ViewPDF fileUrl={pdfUrl}/>
+            </ModalOverlay>
             <FileList>
                 <FileListTitle>파일 목록</FileListTitle>
                 {pdfFileList.length === 0 ?
