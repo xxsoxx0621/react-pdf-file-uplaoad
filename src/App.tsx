@@ -11,6 +11,12 @@ interface Props {
     visible: boolean
 }
 
+const MainContainer = styled.div`
+    display:flex;
+    align-items:center;
+    width:100%;
+    height:600px;
+`;
 const FileContainer = styled.div`
        display:flex;
        justify-content:center;
@@ -50,6 +56,7 @@ const FileResultRow = styled.div`
         display:flex;
         align-items:center;
         padding-left:10px;
+        justify-content:space-between;
         
 `;
 const Input = styled.input`
@@ -85,7 +92,23 @@ const ModalOverlay = styled.div<Props>`
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 999;
 `
+const DeleteButton = styled.button`
+    margin-right:10px;
+`
+const PdfContainer = styled.div`
+    display:flex;
+    flex-direction:column;
+`;
 
+const ButtonContainer = styled.div`
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:10px;
+    
+`;
+const CloseButton = styled.button`
+    width:50px;
+`;
 
 function App() {
     const [pdfFileList, setPdfFileList] = useState<Array<File>>([]);
@@ -94,16 +117,17 @@ function App() {
 
     const getUrl = (file: File) => {
         const blob = new Blob([file]);
-        console.log(blob);
         const pdfUrl = URL.createObjectURL(blob);
         setPdfUrl(pdfUrl);
     }
     const onPdfFileUpload = (e: any) => {
         const selectedList: Array<File> = Array.from(e.target.files);
-        console.log(e.target.files);
         const getAddList = selectedList.map(item => item);
         getUrl(getAddList[0]);
         setPdfFileList(selectedList);
+    }
+    const onDeleteTarget = () => {
+        setPdfFileList([]);
     }
 
     const FileResultList = () => {
@@ -113,13 +137,12 @@ function App() {
                     pdfFileList.map((item, index) => (
                         <FileResultBody>
                             <FileResultRow key={index}>
-                                <a onClick={onUrlClick}>{item.name}</a>
+                                <div onClick={onUrlClick} style={{textDecoration: "darkblue"}}>{item.name}</div>
+                                <DeleteButton onClick={onDeleteTarget}>X</DeleteButton>
                             </FileResultRow>
-
                         </FileResultBody>
                     ))
                 }
-
             </>
         )
     }
@@ -130,23 +153,29 @@ function App() {
         setShowModal(false);
     }
     return (
-        <FileContainer>
-            <ModalOverlay visible={showModal}>
-                <button onClick={onPdfClose}>X</button>
-                <ViewPDF fileUrl={pdfUrl}/>
-            </ModalOverlay>
-            <FileList>
-                <FileListTitle>파일 목록</FileListTitle>
-                {pdfFileList.length === 0 ?
-                    <FileListBody>
-                        <Label htmlFor="uploadFile">파일 업로드하기</Label>
-                        <Input type="file" id="uploadFile" accept="application/pdf" multiple={true}
-                               onChange={onPdfFileUpload}/>
-                    </FileListBody>
-                    : <FileResultList/>
-                }
-            </FileList>
-        </FileContainer>
+        <MainContainer>
+            <FileContainer>
+                <ModalOverlay visible={showModal}>
+                    <PdfContainer>
+                        <ButtonContainer>
+                            <CloseButton onClick={onPdfClose}>X</CloseButton>
+                        </ButtonContainer>
+                        <ViewPDF fileUrl={pdfUrl}/>
+                    </PdfContainer>
+                </ModalOverlay>
+                <FileList>
+                    <FileListTitle>파일 목록</FileListTitle>
+                    {pdfFileList.length === 0 ?
+                        <FileListBody>
+                            <Label htmlFor="uploadFile">파일 업로드하기</Label>
+                            <Input type="file" id="uploadFile" accept="application/pdf" multiple={true}
+                                   onChange={onPdfFileUpload}/>
+                        </FileListBody>
+                        : <FileResultList/>
+                    }
+                </FileList>
+            </FileContainer>
+        </MainContainer>
     );
 }
 
