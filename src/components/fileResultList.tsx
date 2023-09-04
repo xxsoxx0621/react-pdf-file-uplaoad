@@ -10,6 +10,7 @@ export const FileResultList = ({
   onOpenClick,
   onDeleteClick,
 }: Props) => {
+     
   return (
     <>
       {pdfList.map((item, index) => (
@@ -18,7 +19,7 @@ export const FileResultList = ({
             key={index}
             className="w-full h-[30px] flex justify-between shadow-sm"
           >
-            <div onClick={onOpenClick} className="">
+            <div onClick={onOpenClick} className="cursor-pointer">
               <div className="flex items-center justify-center text-sm">
                 <AiOutlineFilePdf className="mr-2"/>
                 {item.name}
