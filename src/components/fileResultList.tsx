@@ -10,27 +10,39 @@ export const FileResultList = ({
   onOpenClick,
   onDeleteClick,
 }: Props) => {
-     
   return (
-    <>
+    <div className="mt-4">
       {pdfList.map((item, index) => (
-        <div className="flex w-full">
+        <div
+          className="flex w-full"
+          key={`pdf` + index}
+        >
           <div
             key={index}
-            className="w-full h-[30px] flex justify-between shadow-sm"
+            className="w-full h-[30px] flex justify-between shadow-sm items-center"
           >
-            <div onClick={onOpenClick} className="cursor-pointer">
-              <div className="flex items-center justify-center text-sm">
-                <AiOutlineFilePdf className="mr-2"/>
-                {item.name}
+            <div
+              id={`${index}`}
+              onClick={onOpenClick}
+              className="cursor-pointer"
+            >
+              <div className="flex items-center justify-center overflow-scroll text-sm">
+                <AiOutlineFilePdf className="mr-2" />
+                <div id={`${index}`} className="w-full overflow-hidden">
+                  {item.name}
+                </div>
               </div>
             </div>
-            <button className="text-sm rounded-full" onClick={onDeleteClick}>
+            <button
+              id={`${index}`}
+              className="text-sm rounded-full"
+              onClick={onDeleteClick}
+            >
               X
             </button>
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
 };

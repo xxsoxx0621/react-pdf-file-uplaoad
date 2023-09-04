@@ -4,6 +4,7 @@ import { ViewPDF } from "./ViewPDF";
 import { pdfjs } from "react-pdf";
 import { FileResultList } from "./components/fileResultList";
 import { BsFillCloudArrowUpFill } from "react-icons/bs";
+import _ from "lodash";
 
 // workerSrc defination
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -13,20 +14,22 @@ function App() {
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [showModal, setShowModal] = useState(false);
 
-  const getUrl = (file: File) => {
+  const getUrl = async (file: File) => {
     const blob = new Blob([file]);
     const pdfUrl = URL.createObjectURL(blob);
-    setPdfUrl(pdfUrl);
+    await setPdfUrl(pdfUrl);
   };
   const onPdfFileUpload = (e: any) => {
     const selectedList: Array<File> = Array.from(e.target.files);
-    const getAddList = selectedList.map((item) => item);
-    getUrl(getAddList[0]);
     setPdfFileList(selectedList);
   };
 
-  const onDeleteTarget = () => {
-    setPdfFileList([]);
+  const onDeleteTarget = (e: any) => {
+    const target = e.target.id;
+    const copyList = _.cloneDeep(pdfFileList);
+    const num = _.toNumber(target);
+    copyList.splice(num, 1);
+    setPdfFileList(copyList);
   };
 
   const onPdfClose = (e: any) => {
@@ -34,13 +37,15 @@ function App() {
   };
 
   const onPdfOpen = (e: any) => {
+    const target = e.target.id;
+    const num = _.toNumber(target);
+    getUrl(pdfFileList[num]);
     setShowModal(e);
   };
 
-  console.log(pdfFileList, pdfFileList.length);
-
+  console.log(pdfUrl, pdfFileList, pdfFileList.length);
   return (
-    <div className="flex items-center w-screen h-screen">
+    <div className="flex w-full h-screen">
       <div className="flex items-center justify-center w-full h-full">
         <div
           className={
